@@ -2,8 +2,10 @@
 import os
 import sys
 import argparse
+import subprocess
 
 DICTIONARY = './dictionary'
+ACK = 'ack-5.12'
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()  # prog="%s %s" % (__package__, help.__name__), description=help.__doc__)
@@ -30,10 +32,10 @@ if __name__ == '__main__':
     else:
         frequency = open(freqpath, 'r').read().strip()
 
-    commands =['cat {}'.format(DICTIONARY)]
+    commands = []
 
     if args.match is not None:
-        commands.append("ack '{}'".format(args.match))
+        commands.append((ACK, "'{}'".format(args.match)))
 
     for (c, p) in sorted(
         [(i, 26-frequency.index(i)) for i in args.include] +
@@ -41,8 +43,12 @@ if __name__ == '__main__':
         key=lambda pair: pair[1]
     ):
         if c in args.include:
-            commands.append('ack {}'.format(c))
+            commands.append((ACK, '{}'.format(c)))
         elif c in args.exclude:
-            commands.append('ack -v {}'.format(c))
+            commands.append((ACK, '-v', '{}'.format(c)))
 
-    print ' | '.join(commands)
+    cmd = subprocess.Popen(('cat', DICTIONARY), stdout=subprocess.PIPE)
+
+    while commands:
+        cmd = subprocess.Popen(commands.pop(0), stdin=cmd.stdout, stdout=subprocess.PIPE)
+    print cmd.communicate()[0]
