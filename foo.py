@@ -35,7 +35,7 @@ if __name__ == '__main__':
     commands = []
 
     if args.match is not None:
-        commands.append((ACK, "'{}'".format(args.match)))
+        commands.append((ACK, "{}".format(args.match)))
 
     for (c, p) in sorted(
         [(i, 26-frequency.index(i)) for i in args.include] +
