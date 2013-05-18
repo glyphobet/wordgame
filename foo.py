@@ -47,8 +47,9 @@ if __name__ == '__main__':
         elif c in args.exclude:
             commands.append((ACK, '-v', '{}'.format(c)))
 
-    cmd = subprocess.Popen(('cat', DICTIONARY), stdout=subprocess.PIPE)
+    newcmd = subprocess.Popen(('cat', DICTIONARY), stdout=subprocess.PIPE)
 
     while commands:
-        cmd = subprocess.Popen(commands.pop(0), stdin=cmd.stdout, stdout=subprocess.PIPE)
-    print cmd.communicate()[0]
+        oldcmd, newcmd = newcmd, subprocess.Popen(commands.pop(0), stdin=newcmd.stdout, stdout=subprocess.PIPE)
+        oldcmd.stdout.close()
+    print newcmd.communicate()[0]
