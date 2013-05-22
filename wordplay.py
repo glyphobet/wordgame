@@ -42,7 +42,7 @@ if __name__ == '__main__':
         frequency = ''.join(reversed(sorted(freqdict.keys(), key=lambda c: freqdict[c])))
         try:
             with open(freqpath, 'w') as freqfile:
-                freqfile.write(frequency)
+                freqfile.write(frequency + '\n')
         except IOError as exc:
             print exc
     else:
