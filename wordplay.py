@@ -9,10 +9,10 @@ ACK = 'ack-5.12'
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()  # prog="%s %s" % (__package__, help.__name__), description=help.__doc__)
-    parser.add_argument('-i', '--include', dest='include', type=set, nargs='?', action='store',  default=set(), help="")
-    parser.add_argument('-e', '--exclude', dest='exclude', type=set, nargs='?', action='store',  default=set(), help="")
-    parser.add_argument('-p', '--prefer',  dest='prefer',  type=str, nargs='?', action='store',  default=str(), help="")
-    parser.add_argument('-m', '--match',   dest='match',   type=str, nargs='+', action='append', default=None,  help="")
+    parser.add_argument('-i',       '--include', dest='include', type=set, nargs='?', action='store',  default=set(), help="")
+    parser.add_argument('-e', '-x', '--exclude', dest='exclude', type=set, nargs='?', action='store',  default=set(), help="")
+    parser.add_argument('-p',       '--prefer',  dest='prefer',  type=str, nargs='?', action='store',  default=str(), help="")
+    parser.add_argument('-m',       '--match',   dest='match',   type=str, nargs='+', action='append', default=None,  help="")
     args = parser.parse_args(sys.argv[1:])
     if args.include & args.exclude:
         sys.exit("Can't include and exclude '{}'".format(''.join(args.include & args.exclude)))
