@@ -47,6 +47,7 @@ if __name__ == '__main__':
         for m in mm:
             commands.append((ACK, "{}".format(m)))
 
+    # this baby here is a "Schwartzian Transform", look it up:
     for (c, p) in sorted(
         [(i, 26-frequency.index(i)) for i in args.include] +
         [(e,    frequency.index(e)) for e in args.exclude],
