@@ -5,7 +5,7 @@ import argparse
 import subprocess
 
 DICTIONARY = 'scrabble'
-ACK = 'ack-5.12'
+GREP = 'ack-5.12'
 
 
 def _fib(n):
@@ -54,7 +54,7 @@ if __name__ == '__main__':
 
     for mm in args.match or []:
         for m in mm:
-            commands.append((ACK, "{}".format(m)))
+            commands.append((GREP, "{}".format(m)))
 
     # this baby here is a "Schwartzian Transform", look it up:
     for (c, p) in sorted(
@@ -63,9 +63,9 @@ if __name__ == '__main__':
         key=lambda pair: pair[1]
     ):
         if c in args.include:
-            commands.append((ACK, '{}'.format(c)))
+            commands.append((GREP, '{}'.format(c)))
         elif c in args.exclude:
-            commands.append((ACK, '-v', '{}'.format(c)))
+            commands.append((GREP, '-v', '{}'.format(c)))
 
     newcmd = subprocess.Popen(('cat', args.dictionary), stdout=subprocess.PIPE)
 
