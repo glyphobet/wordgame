@@ -37,7 +37,7 @@ if __name__ == '__main__':
         freqdict = {}
         with open(args.dictionary, 'r') as dictionary:
             for line in dictionary:
-                for char in line.strip():
+                for char in line.lower().strip():
                     freqdict[char] = freqdict.get(char, 0) + 1
         frequency = ''.join(reversed(sorted(freqdict.keys(), key=lambda c: freqdict[c])))
         with open(freqpath, 'w') as freqfile:
