@@ -4,7 +4,7 @@ import sys
 import argparse
 import subprocess
 
-DICTIONARY = './scrabble'
+DICTIONARY = 'scrabble'
 ACK = 'ack-5.12'
 
 
@@ -20,16 +20,22 @@ if __name__ == '__main__':
     parser.add_argument('-e', '-x', '--exclude', dest='exclude', type=set, nargs='?', action='store',  default=set(), help="")
     parser.add_argument('-p',       '--prefer',  dest='prefer',  type=str, nargs='?', action='store',  default=str(), help="")
     parser.add_argument('-m',       '--match',   dest='match',   type=str, nargs='+', action='append', default=None,  help="")
+    here = os.path.split(os.path.realpath(__file__))[0]
+    parser.add_argument(
+        '-d', '--dictionary', dest='dictionary', type=str, nargs='?',
+        action='store', default=os.path.join(here, DICTIONARY),
+        help="",
+    )
     args = parser.parse_args(sys.argv[1:])
     if args.include & args.exclude:
         sys.exit("Can't include and exclude '{}'".format(''.join(args.include & args.exclude)))
     if set(args.prefer) & args.exclude:
         sys.exit("Can't prefer and exclude '{}'".format(''.join(set(args.prefer) & args.exclude)))
 
-    freqpath = DICTIONARY + '.frequency'
+    freqpath = args.dictionary + '.frequency'
     if not os.access(freqpath, os.R_OK):
         freqdict = {}
-        with open(DICTIONARY, 'r') as dictionary:
+        with open(args.dictionary, 'r') as dictionary:
             for line in dictionary:
                 for char in line.strip():
                     freqdict[char] = freqdict.get(char, 0) + 1
@@ -58,7 +64,7 @@ if __name__ == '__main__':
         elif c in args.exclude:
             commands.append((ACK, '-v', '{}'.format(c)))
 
-    newcmd = subprocess.Popen(('cat', DICTIONARY), stdout=subprocess.PIPE)
+    newcmd = subprocess.Popen(('cat', args.dictionary), stdout=subprocess.PIPE)
 
     while commands:
         oldcmd, newcmd = newcmd, subprocess.Popen(commands.pop(0), stdin=newcmd.stdout, stdout=subprocess.PIPE)
