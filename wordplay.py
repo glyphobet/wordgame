@@ -40,8 +40,11 @@ if __name__ == '__main__':
                 for char in line.lower().strip():
                     freqdict[char] = freqdict.get(char, 0) + 1
         frequency = ''.join(reversed(sorted(freqdict.keys(), key=lambda c: freqdict[c])))
-        with open(freqpath, 'w') as freqfile:
-            freqfile.write(frequency)
+        try:
+            with open(freqpath, 'w') as freqfile:
+                freqfile.write(frequency)
+        except IOError as exc:
+            print exc
     else:
         frequency = open(freqpath, 'r').read().strip()
 
