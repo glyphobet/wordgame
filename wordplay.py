@@ -4,7 +4,7 @@ import sys
 import argparse
 import subprocess
 
-DICTIONARY = './dictionary'
+DICTIONARY = './scrabble'
 ACK = 'ack-5.12'
 
 if __name__ == '__main__':
