@@ -70,8 +70,7 @@ if __name__ == '__main__':
     def score(word):
         s = 0
         for i, c in enumerate(args.prefer):
-            for x in range(word.count(c)):
-                s += fib[len(args.prefer)-i]
+            s += fib[len(args.prefer)-i] * word.count(c)
         return s
 
     words = newcmd.communicate()[0][:-1].split('\n')
