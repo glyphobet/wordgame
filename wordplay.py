@@ -7,6 +7,13 @@ import subprocess
 DICTIONARY = './scrabble'
 ACK = 'ack-5.12'
 
+
+def _fib(n):
+    if n <= 1:
+        return 1
+    return _fib(n-1) + _fib(n-2)
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()  # prog="%s %s" % (__package__, help.__name__), description=help.__doc__)
     parser.add_argument('-i',       '--include', dest='include', type=set, nargs='?', action='store',  default=set(), help="")
@@ -32,6 +39,8 @@ if __name__ == '__main__':
     else:
         frequency = open(freqpath, 'r').read().strip()
 
+    fib = [_fib(n) for n in range(len(frequency)+1)]
+
     commands = []
 
     for mm in args.match or []:
@@ -53,4 +62,18 @@ if __name__ == '__main__':
     while commands:
         oldcmd, newcmd = newcmd, subprocess.Popen(commands.pop(0), stdin=newcmd.stdout, stdout=subprocess.PIPE)
         oldcmd.stdout.close()
-    print newcmd.communicate()[0]
+
+    # remove duplicates from prefer list but keep it sorted
+    args.prefer = ''.join(sorted(list(set(args.prefer)), key=lambda c: args.prefer.index(c)))
+
+    def score(word):
+        s = 0
+        for i, c in enumerate(args.prefer):
+            for x in range(word.count(c)):
+                s += fib[len(args.prefer)-i]
+        return s
+
+    words = newcmd.communicate()[0][:-1].split('\n')
+    words.sort(key=score)
+    for w in words:
+        print(w)
