@@ -20,7 +20,7 @@ if __name__ == '__main__':
     parser.add_argument('-e', '-x', '--exclude', dest='exclude', type=set, nargs='?', action='store',  default=set(), help="One or more letters that must be excluded from the result words.")
     parser.add_argument('-p',       '--prefer',  dest='prefer',  type=str, nargs='?', action='store',  default=str(), help="One or more letters that could be in the result words, in order of preference.")
     parser.add_argument('-m',       '--match',   dest='match',   type=str, nargs='+', action='append', default=None,  help="One or more regular expression patterns that the result words must match.")
-    parser.add_argument('-g',       '--grep',    dest='grep',    type=str, nargs='?', action='store',  default='',    help="Grep-like command to use.")
+    parser.add_argument('-g',       '--grep',    dest='grep',    type=str, nargs='?', action='store',  default='',    help="Grep-like command to use. Tries to use ack, then falls back to grep.")
     here = os.path.split(os.path.realpath(__file__))[0]
     parser.add_argument(
         '-d', '--dictionary', dest='dictionary', type=str, nargs='?',
