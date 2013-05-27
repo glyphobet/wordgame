@@ -5,7 +5,7 @@ import argparse
 import subprocess
 
 DICTIONARY = 'scrabble'
-GREP = 'ack-5.12'
+GREPS = ['ack-5.12', 'ack', 'grep']
 
 
 def _fib(n):
@@ -20,6 +20,7 @@ if __name__ == '__main__':
     parser.add_argument('-e', '-x', '--exclude', dest='exclude', type=set, nargs='?', action='store',  default=set(), help="One or more letters that must be excluded from the result words.")
     parser.add_argument('-p',       '--prefer',  dest='prefer',  type=str, nargs='?', action='store',  default=str(), help="One or more letters that could be in the result words, in order of preference.")
     parser.add_argument('-m',       '--match',   dest='match',   type=str, nargs='+', action='append', default=None,  help="One or more regular expression patterns that the result words must match.")
+    parser.add_argument('-g',       '--grep',    dest='grep',    type=str, nargs='?', action='store',  default='',    help="Grep-like command to use.")
     here = os.path.split(os.path.realpath(__file__))[0]
     parser.add_argument(
         '-d', '--dictionary', dest='dictionary', type=str, nargs='?',
@@ -31,6 +32,11 @@ if __name__ == '__main__':
         sys.exit("Can't include and exclude '{}'".format(''.join(args.include & args.exclude)))
     if set(args.prefer) & args.exclude:
         sys.exit("Can't prefer and exclude '{}'".format(''.join(set(args.prefer) & args.exclude)))
+
+    for g in [args.grep] + GREPS:
+        if subprocess.call(['which', g], stdout=subprocess.PIPE, stderr=subprocess.PIPE) == 0:
+            args.grep = g
+            break
 
     freqpath = args.dictionary + '.frequency'
     if not os.access(freqpath, os.R_OK):
@@ -54,7 +60,7 @@ if __name__ == '__main__':
 
     for mm in args.match or []:
         for m in mm:
-            commands.append((GREP, "{}".format(m)))
+            commands.append((args.grep, "{}".format(m)))
 
     # this baby here is a "Schwartzian Transform", look it up:
     for (c, p) in sorted(
@@ -63,9 +69,9 @@ if __name__ == '__main__':
         key=lambda pair: pair[1]
     ):
         if c in args.include:
-            commands.append((GREP, '{}'.format(c)))
+            commands.append((args.grep, '{}'.format(c)))
         elif c in args.exclude:
-            commands.append((GREP, '-v', '{}'.format(c)))
+            commands.append((args.grep, '-v', '{}'.format(c)))
 
     newcmd = subprocess.Popen(('cat', args.dictionary), stdout=subprocess.PIPE)
 
