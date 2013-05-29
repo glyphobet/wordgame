@@ -19,6 +19,7 @@ if __name__ == '__main__':
     parser.add_argument('-i',       '--include', dest='include', type=set, nargs='?', action='store',  default=set(), help="One or more letters that must be included in the result words.")
     parser.add_argument('-e', '-x', '--exclude', dest='exclude', type=set, nargs='?', action='store',  default=set(), help="One or more letters that must be excluded from the result words.")
     parser.add_argument('-p',       '--prefer',  dest='prefer',  type=str, nargs='?', action='store',  default=str(), help="One or more letters that could be in the result words, in order of preference.")
+    parser.add_argument('-r',       '--rank',    dest='rank',    type=str, nargs='?', action='store',  default='fib', choices=['fib', 'lin'], help="The ranking algorithm to use to sort solutions based on --prefer.")
     parser.add_argument('-m',       '--match',   dest='match',   type=str, nargs='+', action='append', default=None,  help="One or more regular expression patterns that the result words must match.")
     parser.add_argument('-g',       '--grep',    dest='grep',    type=str, nargs='?', action='store',  default='',    help="Grep-like command to use. Tries to use ack, then falls back to grep.")
     here = os.path.split(os.path.realpath(__file__))[0]
@@ -54,8 +55,6 @@ if __name__ == '__main__':
     else:
         frequency = open(freqpath, 'r').read().strip()
 
-    fib = [_fib(n) for n in range(len(frequency)+1)]
-
     commands = []
 
     for mm in args.match or []:
@@ -82,13 +81,22 @@ if __name__ == '__main__':
     # remove duplicates from prefer list but keep it sorted
     args.prefer = ''.join(sorted(list(set(args.prefer)), key=lambda c: args.prefer.index(c)))
 
-    def score(word):
-        s = 0
-        for i, c in enumerate(args.prefer):
-            s += fib[len(args.prefer)-i] * word.count(c)
-        return s
+    if args.rank == 'fib':
+        fib = [_fib(n) for n in range(len(frequency)+1)]
+
+    rank = {
+        # linear scoring; treats each character equally
+        'lin': lambda word: sum(word.count(c) for c in args.prefer),
+        # fibbonacci scoring: ranks each character in descending
+        # order. A word with character N has the same rank as a
+        # word with characters N-1 and N-2.
+        'fib': lambda word: sum(
+            fib[len(args.prefer)-i] * word.count(c)
+            for (i, c) in enumerate(args.prefer)
+        ),
+    }[args.rank]
 
     words = newcmd.communicate()[0][:-1].split('\n')
-    words.sort(key=score)
+    words.sort(key=rank)
     for w in words:
         print(w)
