@@ -16,10 +16,10 @@ def _fib(n):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()  # prog="%s %s" % (__package__, help.__name__), description=help.__doc__)
-    parser.add_argument('-i',       '--include', dest='include', type=set, nargs='?', action='store',  default=set(), help="One or more letters that must be included in the result words.")
-    parser.add_argument('-e', '-x', '--exclude', dest='exclude', type=set, nargs='?', action='store',  default=set(), help="One or more letters that must be excluded from the result words.")
-    parser.add_argument('-p',       '--prefer',  dest='prefer',  type=str, nargs='?', action='store',  default=str(), help="One or more letters that could be in the result words, in order of preference.")
-    parser.add_argument('-r',       '--rank',    dest='rank',    type=str, nargs='?', action='store',  default='fib', choices=['fib', 'lin'], help="The ranking algorithm to use to sort solutions based on --prefer.")
+    parser.add_argument('-i',       '--include', dest='include', type=set, nargs='?', action='store',  default=set(), const=set(), help="One or more letters that must be included in the result words.")
+    parser.add_argument('-e', '-x', '--exclude', dest='exclude', type=set, nargs='?', action='store',  default=set(), const=set(), help="One or more letters that must be excluded from the result words.")
+    parser.add_argument('-p',       '--prefer',  dest='prefer',  type=str, nargs='?', action='store',  default=str(), const=set(), help="One or more letters that could be in the result words, in order of preference.")
+    parser.add_argument('-r',       '--rank',    dest='rank',    type=str, nargs='?', action='store',  default='fib', const='fib', choices=['fib', 'lin'], help="The ranking algorithm to use to sort solutions based on --prefer.")
     parser.add_argument('-m',       '--match',   dest='match',   type=str, nargs='+', action='append', default=None,  help="One or more regular expression patterns that the result words must match.")
     parser.add_argument('-g',       '--grep',    dest='grep',    type=str, nargs='?', action='store',  default='',    help="Grep-like command to use. Tries to use ack, then falls back to grep.")
     here = os.path.split(os.path.realpath(__file__))[0]
@@ -34,7 +34,9 @@ if __name__ == '__main__':
     if set(args.prefer) & args.exclude:
         sys.exit("Can't prefer and exclude '{}'".format(''.join(set(args.prefer) & args.exclude)))
 
-    for g in [args.grep] + GREPS:
+    if args.grep:
+        GREPS = [args.grep] + GREPS
+    for g in GREPS:
         if subprocess.call(['which', g], stdout=subprocess.PIPE, stderr=subprocess.PIPE) == 0:
             args.grep = g
             break
